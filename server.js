@@ -24,7 +24,7 @@ app.post("/sendmail", async (req, res) => {
 
   const msg = {
     to: "vaibhavdaspute775@gmail.com",  // तुझा mail
-    from: "vaibhavdaspute775@gmail.com", // verified SendGrid email
+    from: "vaibhavdaspute81@gmail.com", // verified SendGrid email
     subject: "Portfolio Inquiry - Vaibhav Daspute",
     text: `
 Portfolio Inquiry Received
