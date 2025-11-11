@@ -1,7 +1,7 @@
 const express = require("express");
-const nodemailer = require("nodemailer");
 const cors = require("cors");
 const path = require("path");
+const sgMail = require("@sendgrid/mail");
 
 const app = express();
 app.use(cors());
@@ -15,23 +15,16 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// ✅ Gmail SMTP (App Password Required)
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "vaibhavdaspute775@gmail.com",
-    pass: "wwvk jhdz mtzf rtcn"
-  }
-});
+// ✅ SendGrid API Key (Environment Variable recommended)
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // ✅ API route
-app.post("/sendmail", (req, res) => {
+app.post("/sendmail", async (req, res) => {
   const { name, email, phone, message } = req.body;
 
-  const mailOptions = {
-    from: "vaibhavdaspute775@gmail.com",
-    replyTo: email,
-    to: "vaibhavdaspute775@gmail.com",
+  const msg = {
+    to: "vaibhavdaspute775@gmail.com",  // तुझा mail
+    from: "vaibhavdaspute775@gmail.com", // verified SendGrid email
     subject: "Portfolio Inquiry - Vaibhav Daspute",
     text: `
 Portfolio Inquiry Received
@@ -42,19 +35,19 @@ Phone: ${phone}
 
 Message:
 ${message}
-`
+    `,
   };
 
-  transporter.sendMail(mailOptions, (error) => {
-    if (error) {
-      console.log(error);
-      return res.send("Failed to send ❌");
-    }
+  try {
+    await sgMail.send(msg);
     return res.send("Message Sent Successfully ✅");
-  });
+  } catch (error) {
+    console.log(error);
+    return res.send("Failed to send ❌");
+  }
 });
 
-// ✅ Render PORT fix — MOST IMPORTANT
+// ✅ Render PORT fix
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("✅ Server running on PORT:", PORT);
